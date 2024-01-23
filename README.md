@@ -26,11 +26,12 @@ instructions should work on most MacOS and Linux machines.
 
 ## Learnings
 
-Using this much trignometry was quite fun yet stressful. 
-It might be much easier to define the camera plane and rely less on
-trignometry and use the fact that a vector has two components, and
-for calculating the distance, we really only need one of these
-components if we know how much the length of the ray increases
-whenever one of the components increases by 1. This might help
-reduce floating point errors, which were quite dissatisfying. 
+Using this much trignometry was quite fun, but it would have been
+easier to implement the caster with less of it it. We can define a 
+camera plane to implicitly define the field of view. To calculate the 
+distance, we really only need to know how much the length of the ray 
+increases whenever one of the components increases by 1. We can use this 
+fact by determining which side the intersection occurs on, and, then,
+use the corresponding component.This might help reduce floating point 
+errors, which were quite dissatisfying. 
 
