@@ -144,13 +144,23 @@ func draw2D(g *Game, screen *ebiten.Image) {
 }
 
 func draw3D(g *Game, screen *ebiten.Image, canvas_offset float32) {
-	start_ray_rad := g.camera.xy_rotation - (g.camera.fov / 2)
-	ray_rad_increment := g.camera.fov / (float64(g.width) - 1)
+	// start_ray_rad := g.camera.xy_rotation - (g.camera.fov / 2)
+	// ray_rad_increment := g.camera.fov / (float64(g.width) - 1)
 	h := g.height
-	ray := start_ray_rad
+	// ray := start_ray_rad
 
+	target_plane_x := 0.5
 	for i := 0; i < g.width; i++ {
-		dist, _, _ := utils.DDA(g.grid, g.camera.x, g.camera.y, ray, false)
+		// we will calculate the radians of the ray that will go through this pixel
+		// in the camera plan
+		target_x_from_plane_center := target_plane_x - g.camera.plane_width/2
+		radian_offset_from_xy_rotation := math.Atan(target_x_from_plane_center / g.camera.plane_dist_from_camera)
+		ray := radian_offset_from_xy_rotation + g.camera.xy_rotation
+
+		// the euclidean dist has some distortion
+		euclidean_dist, _, _ := utils.DDA(g.grid, g.camera.x, g.camera.y, ray, false)
+		// lets correct the fisheye distortion using some trignometry to get the perpendicular height
+		dist := euclidean_dist * math.Cos(radian_offset_from_xy_rotation)
 
 		// Height of line to draw
 		lineHeight := (int)(float64(h) / dist)
@@ -169,7 +179,8 @@ func draw3D(g *Game, screen *ebiten.Image, canvas_offset float32) {
 
 		vector.StrokeLine(screen, canvas_offset+float32(i), float32(drawStart), canvas_offset+float32(i), float32(drawEnd), 1, line_color, false)
 
-		ray += ray_rad_increment
+		// ray += ray_rad_increment
+		target_plane_x += 1
 	}
 }
 
@@ -192,13 +203,13 @@ func ebitenGameLoop(grid [][]bool) {
 	ebiten.SetWindowSize(window_width, window_height)
 	ebiten.SetWindowTitle("Raycaster!")
 
-	fov := 0.75 * math.Pi
+	fov := 0.5 * math.Pi
 	plane_width := float64(canvas_width)
 	plane_dist_from_camera := plane_width / (2 * math.Tan(fov/2))
 
 	camera := Camera{
-		x:                      7,
-		y:                      7,
+		x:                      6,
+		y:                      6,
 		xy_rotation:            0,
 		fov:                    fov,
 		plane_width:            float64(canvas_width),

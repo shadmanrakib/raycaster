@@ -8,17 +8,15 @@ So, I created this raycasting sandbox to experiment with it.
 On the left half of the screen, I have a top-down 2D view of the
 map with rays being casted from the player. On the right half, I
 implemented a 3D view of the scene using the euclidean distances I
-got from raycasting. I've left the fisheye effect (distortion) 
-because I thought it looked cool. It's possible to correct the 
-distortion by casting rays into the pixels of the camera plane 
-instead of evenly spacing them out. The euclidean distances returned 
-should be converted to perpendicular distances with a bit of trignometry.
+got from raycasting. The euclidean distances returned 
+are converted to perpendicular distances with a bit of trignometry to
+get a less distorted image.
 
 ## Movement and Keybindings
 
 Movement is relative to the 2D top down view. To move around in the 
 demo, use the WASD keys or the arrow keys. To rotate clockwise, use 
-the F key or the Space key. To rotate counter-clockwise use the G key.
+the F key or the Space key. To rotate counter-clockwise, use the G key.
 
 ## Installation
 

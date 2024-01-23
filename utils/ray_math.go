@@ -12,13 +12,6 @@ func CalcNormDirVectorFromRadians(xy_rotation float64) (float64, float64) {
 	return -1 * math.Cos(xy_rotation), math.Sin(xy_rotation)
 }
 
-// Get the perpendicular distance from the camera
-// useful to correct fish eye effect
-func GetPerpendicularDistance(distance, ray_angle, fov float64) float64 {
-	// TODO: Implement fish eye correction
-	return distance * math.Cos(ray_angle)
-}
-
 func GetTargetInStepDirection(x, y float64, x_step, y_step int) (float64, float64) {
 	target_x, target_y := x, y
 
