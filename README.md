@@ -10,7 +10,7 @@ map with rays being casted from the player. On the right half, I
 implemented a 3D view of the scene using the euclidean distances I
 got from raycasting. I've left the fisheye effect (distortion) 
 because I thought it looked cool. It's possible to correct the 
-distortion by using the perpendicular distance or make sure to cast
+distortion by using the perpendicular distance or by making sure to cast
 rays into the pixels of the camera plane instead of evenly spacing them
 out.
 
