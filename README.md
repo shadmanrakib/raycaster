@@ -10,7 +10,7 @@ map with rays being casted from the player. On the right half, I
 implemented a 3D view of the scene using the euclidean distances I
 got from raycasting. The euclidean distances returned 
 are converted to perpendicular distances with a bit of trignometry to
-get a less distorted image.
+get a less distorted image of the 3D space.
 
 ## Movement and Keybindings
 
@@ -33,5 +33,5 @@ distance, we really only need to know how much the length of the ray
 increases whenever one of the components increases by 1. We can use this 
 fact by determining which side the intersection occurs on, and, then,
 use the corresponding component. This might help reduce floating point 
-errors, which were quite dissatisfying. 
+errors. 
 
