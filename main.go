@@ -16,44 +16,61 @@ var MIN_ROTATION float64 = 0
 var MAX_ROTATION float64 = 2 * math.Pi
 
 type Camera struct {
-	// xy_rotation is in rads
-	x, y, xy_rotation, fov float64
+	// player pos
+	x, y float64
+
+	// xy_rotation and fov is in rads
+	xy_rotation, fov float64
+
+	// projection plane width and dist from camera, since we only need 2D plane
+	plane_width            float64
+	plane_dist_from_camera float64
 }
 
 type Game struct {
-	width, height, scale_factor                                           int
-	grid                                                                  [][]bool
-	camera                                                                Camera
-	player_size                                                           float64
+	// screen size and scale factor from grid units to pixels
+	width, height, scale_factor int
+
+	// map
+	grid [][]bool
+
+	// camera
+	camera Camera
+
+	// player diameter
+	player_size float64
+
+	// key down states for movement
 	key_down_is_down, key_up_is_down, key_left_is_down, key_right_is_down bool
 	key_rotate_clockwise_is_down, key_rotate_counter_clockwise_is_down    bool
 }
 
 func (g *Game) Update() error {
 	// movement
-	if inpututil.IsKeyJustPressed(ebiten.KeyW) || inpututil.IsKeyJustPressed(ebiten.KeyUp) {
-		g.key_up_is_down = true
+	keyMapping := map[ebiten.Key]*bool{
+		// up, down, left, right movement
+		ebiten.KeyW:     &g.key_up_is_down,
+		ebiten.KeyUp:    &g.key_up_is_down,
+		ebiten.KeyS:     &g.key_down_is_down,
+		ebiten.KeyDown:  &g.key_down_is_down,
+		ebiten.KeyA:     &g.key_left_is_down,
+		ebiten.KeyLeft:  &g.key_left_is_down,
+		ebiten.KeyD:     &g.key_right_is_down,
+		ebiten.KeyRight: &g.key_right_is_down,
+
+		// rotation
+		ebiten.KeySpace: &g.key_rotate_clockwise_is_down,
+		ebiten.KeyF:     &g.key_rotate_clockwise_is_down,
+		ebiten.KeyG:     &g.key_rotate_counter_clockwise_is_down,
 	}
-	if inpututil.IsKeyJustPressed(ebiten.KeyS) || inpututil.IsKeyJustPressed(ebiten.KeyDown) {
-		g.key_down_is_down = true
-	}
-	if inpututil.IsKeyJustPressed(ebiten.KeyA) || inpututil.IsKeyJustPressed(ebiten.KeyLeft) {
-		g.key_left_is_down = true
-	}
-	if inpututil.IsKeyJustPressed(ebiten.KeyD) || inpututil.IsKeyJustPressed(ebiten.KeyRight) {
-		g.key_right_is_down = true
-	}
-	if inpututil.IsKeyJustReleased(ebiten.KeyW) || inpututil.IsKeyJustReleased(ebiten.KeyUp) {
-		g.key_up_is_down = false
-	}
-	if inpututil.IsKeyJustReleased(ebiten.KeyS) || inpututil.IsKeyJustReleased(ebiten.KeyDown) {
-		g.key_down_is_down = false
-	}
-	if inpututil.IsKeyJustReleased(ebiten.KeyA) || inpututil.IsKeyJustReleased(ebiten.KeyLeft) {
-		g.key_left_is_down = false
-	}
-	if inpututil.IsKeyJustReleased(ebiten.KeyD) || inpututil.IsKeyJustReleased(ebiten.KeyRight) {
-		g.key_right_is_down = false
+
+	for key, variable := range keyMapping {
+		if inpututil.IsKeyJustPressed(key) {
+			*variable = true
+		}
+		if inpututil.IsKeyJustReleased(key) {
+			*variable = false
+		}
 	}
 
 	if g.key_up_is_down && utils.CanContinueInDirection(g.grid, g.camera.x-g.player_size/2, g.camera.y, -0.05, 0) {
@@ -69,27 +86,12 @@ func (g *Game) Update() error {
 		g.camera.y += 0.05
 	}
 
-	// rotation
-	if inpututil.IsKeyJustPressed(ebiten.KeySpace) || inpututil.IsKeyJustPressed(ebiten.KeyF) {
-		g.key_rotate_clockwise_is_down = true
-	}
-	if inpututil.IsKeyJustPressed(ebiten.KeyG) {
-		g.key_rotate_counter_clockwise_is_down = true
-	}
-
-	if inpututil.IsKeyJustReleased(ebiten.KeySpace) || inpututil.IsKeyJustReleased(ebiten.KeyF) {
-		g.key_rotate_clockwise_is_down = false
-	}
-	if inpututil.IsKeyJustReleased(ebiten.KeyG) {
-		g.key_rotate_counter_clockwise_is_down = false
-	}
-
 	if g.key_rotate_counter_clockwise_is_down {
-		g.camera.xy_rotation -= 0.01
+		g.camera.xy_rotation -= 0.025
 	}
 
 	if g.key_rotate_clockwise_is_down {
-		g.camera.xy_rotation += 0.01
+		g.camera.xy_rotation += 0.025
 	}
 
 	return nil
@@ -180,10 +182,7 @@ func (g *Game) Layout(outsideWidth, outsideHeight int) (screenWidth, screenHeigh
 	return outsideWidth, outsideHeight
 }
 
-func ebitenGameLoop(file string) {
-	body, _ := os.ReadFile(file)
-	grid := utils.ParseGrid(string(body))
-
+func ebitenGameLoop(grid [][]bool) {
 	scale_factor := 50
 	canvas_width := len(grid[0]) * scale_factor
 	canvas_height := len(grid) * scale_factor
@@ -193,11 +192,17 @@ func ebitenGameLoop(file string) {
 	ebiten.SetWindowSize(window_width, window_height)
 	ebiten.SetWindowTitle("Raycaster!")
 
+	fov := 0.75 * math.Pi
+	plane_width := float64(canvas_width)
+	plane_dist_from_camera := plane_width / (2 * math.Tan(fov/2))
+
 	camera := Camera{
-		x:           7,
-		y:           7,
-		xy_rotation: 0,
-		fov:         0.6 * math.Pi,
+		x:                      7,
+		y:                      7,
+		xy_rotation:            0,
+		fov:                    fov,
+		plane_width:            float64(canvas_width),
+		plane_dist_from_camera: plane_dist_from_camera,
 	}
 	game := Game{
 		width:                                canvas_width,
@@ -221,5 +226,8 @@ func ebitenGameLoop(file string) {
 
 func main() {
 	file := "map.txt"
-	ebitenGameLoop(file)
+	body, _ := os.ReadFile(file)
+	world := utils.ParseGrid(string(body))
+
+	ebitenGameLoop(world)
 }

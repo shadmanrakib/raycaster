@@ -96,7 +96,7 @@ func DDA(grid [][]bool, x, y, xy_rotation float64, debugging bool) (float64, flo
 	wall_tile_found := false
 	iter := 0
 	max_iter := len(grid) * len(grid[0])
-	distance := 0.0
+	// distance := 0.0
 
 	for !wall_tile_found && iter < max_iter {
 		iter += 1
@@ -109,13 +109,11 @@ func DDA(grid [][]bool, x, y, xy_rotation float64, debugging bool) (float64, flo
 
 		if line_x < line_y {
 			debugPrint(debugging, "Choosing X", cur_x, cur_y, t_x, t_y)
-			distance += line_x
 			cur_x = t_x
 			cur_y = y + float64(ray_dir_y)*(float64(t_x-x)/ray_dir_x)
 			debugPrint(debugging, "Choose X", cur_x, cur_y)
 		} else {
 			debugPrint(debugging, "Choosing Y", cur_x, cur_y, t_x, t_y)
-			distance += line_y
 			cur_y = t_y
 			cur_x = x + float64(ray_dir_x)*(float64(t_y-y)/ray_dir_y)
 			debugPrint(debugging, "Choose Y", cur_x, cur_y)
@@ -125,6 +123,8 @@ func DDA(grid [][]bool, x, y, xy_rotation float64, debugging bool) (float64, flo
 			wall_tile_found = true
 		}
 	}
+
+	distance := math.Sqrt(math.Pow((cur_x-x), 2) + math.Pow((cur_y-y), 2))
 
 	return distance, cur_x, cur_y
 }
