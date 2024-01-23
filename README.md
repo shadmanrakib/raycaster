@@ -10,9 +10,8 @@ map with rays being casted from the player. On the right half, I
 implemented a 3D view of the scene using the euclidean distances I
 got from raycasting. I've left the fisheye effect (distortion) 
 because I thought it looked cool. It's possible to correct the 
-distortion by using the perpendicular distance or by making sure to cast
-rays into the pixels of the camera plane instead of evenly spacing them
-out.
+distortion by casting rays into the pixels of the camera plane instead of evenly spacing them out. The euclidean distances returned should be
+converted to perpendicular distances with a bit of trignometry.
 
 ## Movement and Keybindings
 
@@ -30,11 +29,10 @@ instructions should work on most MacOS and Linux machines.
 ## Learnings
 
 Using this much trignometry was quite fun, but it would have been
-easier to implement the caster with less of it it. We can define a 
-camera plane to implicitly define the field of view. To calculate the 
+easier to implement the caster with less of it it. To calculate the 
 distance, we really only need to know how much the length of the ray 
 increases whenever one of the components increases by 1. We can use this 
 fact by determining which side the intersection occurs on, and, then,
-use the corresponding component.This might help reduce floating point 
+use the corresponding component. This might help reduce floating point 
 errors, which were quite dissatisfying. 
 
