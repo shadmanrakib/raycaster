@@ -1,5 +1,8 @@
 # Raycaster
 
+https://github.com/shadmanrakib/raycaster/assets/64807913/fbfbb9ef-68d9-4f73-b304-3674a4cb7a89
+
+
 I really wanted to explore raycasting and some of the math behind it. 
 So, I created this raycasting sandbox to experiment with it. 
 On one the left half of the screen, I have a top-down 2D view of the
