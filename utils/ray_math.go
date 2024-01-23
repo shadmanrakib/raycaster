@@ -1,7 +1,6 @@
 package utils
 
 import (
-	"fmt"
 	"math"
 )
 
@@ -51,13 +50,7 @@ func CanContinueInDirection(grid [][]bool, x, y float64, ray_dir_x, ray_dir_y fl
 	return true
 }
 
-func debugPrint(print bool, a ...any) {
-	if print {
-		fmt.Println(a...)
-	}
-}
-
-func DDA(grid [][]bool, x, y, xy_rotation float64, debugging bool) (float64, float64, float64) {
+func CalculateDistanceOfCastedRay(grid [][]bool, x, y, xy_rotation float64, debugging bool) (float64, float64, float64) {
 	// need to calculate the norm vector direction from the xy_rotation
 	ray_dir_x, ray_dir_y := CalcNormDirVectorFromRadians(xy_rotation)
 
@@ -92,28 +85,29 @@ func DDA(grid [][]bool, x, y, xy_rotation float64, debugging bool) (float64, flo
 	// distance := 0.0
 
 	for !wall_tile_found && iter < max_iter {
+		if !CanContinueInDirection(grid, cur_x, cur_y, ray_dir_x, ray_dir_y) {
+			wall_tile_found = true
+			break
+		}
+
 		iter += 1
 
 		t_x, t_y := GetTargetInStepDirection(cur_x, cur_y, x_step, y_step)
 		dist_x, dist_y := math.Abs(t_x-cur_x), math.Abs(t_y-cur_y)
 		line_x, line_y := dist_x*x_unit_step, dist_y*y_unit_step
 
-		debugPrint(debugging, "At:", cur_x, cur_y, "\t Towards:", t_x, t_y, "\t X Option:", dist_x, line_x, "\t Y Option:", dist_y, line_y)
+		DebugPrint(debugging, "At:", cur_x, cur_y, "\t Towards:", t_x, t_y, "\t X Option:", dist_x, line_x, "\t Y Option:", dist_y, line_y)
 
 		if line_x < line_y {
-			debugPrint(debugging, "Choosing X", cur_x, cur_y, t_x, t_y)
+			DebugPrint(debugging, "Choosing X", cur_x, cur_y, t_x, t_y)
 			cur_x = t_x
 			cur_y = y + float64(ray_dir_y)*(float64(t_x-x)/ray_dir_x)
-			debugPrint(debugging, "Choose X", cur_x, cur_y)
+			DebugPrint(debugging, "Choose X", cur_x, cur_y)
 		} else {
-			debugPrint(debugging, "Choosing Y", cur_x, cur_y, t_x, t_y)
+			DebugPrint(debugging, "Choosing Y", cur_x, cur_y, t_x, t_y)
 			cur_y = t_y
 			cur_x = x + float64(ray_dir_x)*(float64(t_y-y)/ray_dir_y)
-			debugPrint(debugging, "Choose Y", cur_x, cur_y)
-		}
-
-		if !CanContinueInDirection(grid, cur_x, cur_y, ray_dir_x, ray_dir_y) {
-			wall_tile_found = true
+			DebugPrint(debugging, "Choose Y", cur_x, cur_y)
 		}
 	}
 

@@ -135,7 +135,7 @@ func draw2D(g *Game, screen *ebiten.Image) {
 	ray := start_ray_rad
 
 	for i := 0; i < num_rays; i++ {
-		dist, _, _ := utils.DDA(g.grid, g.camera.x, g.camera.y, ray, false)
+		dist, _, _ := utils.CalculateDistanceOfCastedRay(g.grid, g.camera.x, g.camera.y, ray, false)
 		norm_x, norm_y := utils.CalcNormDirVectorFromRadians(ray)
 		f_x, f_y := dist*norm_x*float64(g.scale_factor)+g.camera.x*float64(g.scale_factor), dist*norm_y*float64(g.scale_factor)+g.camera.y*float64(g.scale_factor)
 		vector.StrokeLine(screen, float32(g.camera.y)*float32(g.scale_factor), float32(g.camera.x)*float32(g.scale_factor), float32(f_y), float32(f_x), 1, color.White, false)
@@ -158,12 +158,12 @@ func draw3D(g *Game, screen *ebiten.Image, canvas_offset float32) {
 		ray := radian_offset_from_xy_rotation + g.camera.xy_rotation
 
 		// the euclidean dist has some distortion
-		euclidean_dist, _, _ := utils.DDA(g.grid, g.camera.x, g.camera.y, ray, false)
+		euclidean_dist, _, _ := utils.CalculateDistanceOfCastedRay(g.grid, g.camera.x, g.camera.y, ray, false)
 		// lets correct the fisheye distortion using some trignometry to get the perpendicular height
 		dist := euclidean_dist * math.Cos(radian_offset_from_xy_rotation)
 
 		// Height of line to draw
-		lineHeight := (int)(float64(h) / dist)
+		lineHeight := int(float64(h) / dist)
 
 		// Find start and end of line, cap the line if out of screen
 		drawStart := -lineHeight/2 + h/2
@@ -175,7 +175,7 @@ func draw3D(g *Game, screen *ebiten.Image, canvas_offset float32) {
 			drawEnd = h - 1
 		}
 
-		line_color := color.RGBA{uint8(210*(1/(dist+1))) + 45, 0, 0, 255}
+		line_color := color.RGBA{uint8(215*(1/(dist+1))) + 40, 0, 0, 255}
 
 		vector.StrokeLine(screen, canvas_offset+float32(i), float32(drawStart), canvas_offset+float32(i), float32(drawEnd), 1, line_color, false)
 
