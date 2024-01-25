@@ -163,7 +163,7 @@ func draw3D(g *Game, screen *ebiten.Image, canvas_offset float32) {
 		dist := euclidean_dist * math.Cos(radian_offset_from_xy_rotation)
 
 		// Height of line to draw
-		lineHeight := int(float64(h) / dist)
+		lineHeight := int(float64(h) / dist / 2)
 
 		// Find start and end of line, cap the line if out of screen
 		drawStart := -lineHeight/2 + h/2
